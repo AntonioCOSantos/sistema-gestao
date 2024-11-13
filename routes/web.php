@@ -1,32 +1,41 @@
 <?php
 
+use App\Http\Controllers\GrupoController;
+use App\Http\Controllers\BandeiraController;
+use App\Http\Controllers\UnidadeController;
+use App\Http\Controllers\ColaboradorController;
+use App\Http\Controllers\RelatorioController;
+use App\Http\Controllers\AuditoriaController;
+use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+// Autenticação
+Auth::routes();
 
-Route::get('/', function () {
-    return view('welcome');
+// Página inicial
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Rotas de CRUD protegidas por autenticação
+Route::middleware(['auth'])->group(function () {
+    // Grupo Econômico
+    Route::resource('grupos', GrupoController::class);
+
+    // Bandeira
+    Route::resource('bandeiras', BandeiraController::class);
+
+    // Unidade
+    Route::resource('unidades', UnidadeController::class);
+
+    // Colaborador
+    Route::resource('colaboradores', ColaboradorController::class);
+
+    // Relatório de Colaboradores
+    Route::get('relatorio/colaboradores', [RelatorioController::class, 'gerarRelatorio'])->name('relatorio.colaboradores');
+
+    // Exportar Relatório de Colaboradores
+    Route::get('relatorio/colaboradores/exportar', [RelatorioController::class, 'exportar'])->name('relatorio.colaboradores.exportar');
+
+    // Auditoria
+    //Route::get('auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
 });
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
-
-require __DIR__.'/auth.php';
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
